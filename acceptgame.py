@@ -6,11 +6,12 @@ import threading
 import keyboard
 import pystray
 from pystray import MenuItem as item
+import webbrowser
 
 class AutoAcceptApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Auto Accept - By Pedro")
+        self.root.title("Auto Accept v3.0 - By Pedro")
         self.root.geometry("370x380")
         self.root.configure(bg="#06122b")
         self.status_color = "#FFFFFF"
@@ -25,8 +26,6 @@ class AutoAcceptApp:
         self.status_text.insert(tk.END, "Status: Aceitando automaticamente...\n")
         self.status_text.config(state=tk.DISABLED)
 
-        self.status_text.config(cursor="arrow")
-
         self.button_frame = tk.Frame(self.root, bg="#06122b")
         self.button_frame.pack(pady=10)
 
@@ -38,7 +37,19 @@ class AutoAcceptApp:
 
         self.gear_button = tk.Button(self.root, text="⚙️", command=self.gear_button_action, height=1, width=3, bg=self.root.cget("bg"), fg="white", font=("Comic Sans M", 12, "bold"), bd=0,
                                      highlightthickness=0, highlightbackground=self.root.cget("bg"), relief="flat")
+        
         self.gear_button.place(x=5, y=345)
+
+        self.info_button = tk.Button(
+            self.root, text="ℹ️", command=self.open_download_link, height=1, width=3, 
+            bg=self.root.cget("bg"), fg="white", font=("Comic Sans M", 12, "bold"), bd=0,
+            highlightthickness=0, highlightbackground=self.root.cget("bg"), relief="flat"
+        )
+        self.info_button.place(x=335, y=345)
+
+        self.version_label = tk.Label(self.root, text="versões", bg=self.root.cget("bg"), fg="white", font=("Comic Sans M", 8, "bold"))
+        self.version_label.place(x=315, y=320)
+        self.version_label.place_forget()
 
         self.theme_menu = tk.Menu(self.root, tearoff=0)
         self.theme_menu.add_command(label="Claro", command=self.set_light_theme)
@@ -52,6 +63,9 @@ class AutoAcceptApp:
 
         self.gear_button.bind("<Enter>", self.on_gear_button_hover)
         self.gear_button.bind("<Leave>", self.on_gear_button_leave)
+
+        self.info_button.bind("<Enter>", self.on_info_button_hover)
+        self.info_button.bind("<Leave>", self.on_info_button_leave)
 
         self.stop_event = threading.Event()
 
@@ -71,6 +85,16 @@ class AutoAcceptApp:
         self.icon.icon = Image.open("icon.png")
         self.icon.visible = True
         self.icon.menu = pystray.Menu(item("Abrir", self.restore_window), item("Fechar", self.close_program))
+
+    def open_download_link(self):
+        webbrowser.open("https://github.com/pedro09312/Auto-Accept-LOL/tags")
+
+    def on_info_button_hover(self, event):
+        self.version_label.place(x=315, y=320)
+        self.version_label.lift()
+
+    def on_info_button_leave(self, event):
+        self.version_label.place_forget()
 
     def toggle_searching(self):
         self.searching = not self.searching
@@ -101,12 +125,11 @@ class AutoAcceptApp:
                         pyautogui.mouseUp(x=accept_button_center[0], y=accept_button_center[1])
 
                         self.update_status("Aceitando novamente...\n")
-                        time.sleep(1)
+                        
+                        time.sleep(12)
 
                 except Exception as e:
                     pass
-
-            time.sleep(12)
 
     def minimize_to_tray(self):
         self.root.withdraw()
@@ -154,19 +177,16 @@ class AutoAcceptApp:
         self.update_status("Tema dark ativado.\n")
 
     def on_button_hover(self, event):
-        event.widget.config(bg=self.button_hover_color)
-        event.widget.config(cursor="hand2")
+        event.widget.config(bg=self.button_hover_color, cursor="hand2")
 
     def on_button_leave(self, event):
-        event.widget.config(bg=self.button_color)
-        event.widget.config(cursor="arrow")
+        event.widget.config(bg=self.button_color, cursor="arrow")
 
     def on_gear_button_hover(self, event):
         event.widget.config(cursor="hand2")
 
     def on_gear_button_leave(self, event):
         event.widget.config(cursor="arrow")
-
 
 root = tk.Tk()
 app = AutoAcceptApp(root)
